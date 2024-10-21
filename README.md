@@ -1,7 +1,44 @@
 # Mid-term Project Scenario #2:
 
+### Create master key
+
+```sql
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'vishal@1234';
+```
+ 
+### Create database scoped credential
+
+```sql
+CREATE DATABASE SCOPED CREDENTIAL OrderStorageCredential 
+WITH IDENTITY = 'microsoftstorageaccount',
+SECRET = 'AJWY+ht8ITfUNBtkG8CLAKtZWrMf5tavQqptJ8cf5rC9jHAjM0Frp19I+Ak5FTKPL=sw=';
+```
+
+### Create external data source
+
+```sql
+CREATE EXTERNAL DATA SOURCE OrderExternalDataSource
+WITH (
+    TYPE = HADOOP,
+    LOCATION = 'wasbs://orderstoragecontainer@orderstorageacq3.blob.core.windows.net',
+    CREDENTIAL = OrderStorageCredential
+);
+```
+
+ 
+### Create external file format
+
+```sql
+CREATE EXTERNAL FILE FORMAT CsvFileFormat
+WITH (
+    FORMAT_TYPE = DELIMITEDTEXT,
+    FORMAT_OPTIONS (FIELD_TERMINATOR = ',', STRING_DELIMITER = '"', FIRST_ROW = 2)
+);
+```
+
 ### Create a External Data Soruce:
 
+```sql
 CREATE EXTERNAL TABLE ExtraOrdersData1 (
     ORDERNUMBER INT,
     QUANTITYORDERED INT,
@@ -58,10 +95,13 @@ SELECT
     CONTACTFIRSTNAME,
     DEALSIZE
 FROM ExtraOrdersData1;
+```
 
 ## SQL Queries for creating a view
 
 ### Create a View for the Salesbycountry
+
+```sql
 CREATE VIEW vw_SalesByCountry AS
 SELECT
     COUNTRY,
@@ -70,8 +110,11 @@ SELECT
     SUM(SALES) AS TotalSales
 FROM ExtraOrdersData1
 GROUP BY COUNTRY;
+```
 
 ### Create a View for the productperformance
+
+```sql
 CREATE VIEW vw_ProductPerformance AS
 SELECT
     PRODUCTLINE,
@@ -82,8 +125,12 @@ SELECT
     AVG(PRICEEACH) AS AveragePrice
 FROM ExtraOrdersData1
 GROUP BY PRODUCTLINE, PRODUCTCODE;
+```
 
 ### Create a View for the Topcustomer
+
+
+```sql
 CREATE VIEW vw_TopCustomersBySales1 AS
 SELECT TOP 100
     CUSTOMERNAME,
